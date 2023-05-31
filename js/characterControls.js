@@ -20,6 +20,7 @@ export class CharacterControls {
   // constants
   fadeDuration = 0.2;
   walkVelocity = 4;
+  angleTuned = -135;
 
   constructor(model, mixer, animationsMap, camera, currentAction) {
     this.model = model;
@@ -70,7 +71,7 @@ export class CharacterControls {
       // rotate model
       this.rotateQuarternion.setFromAxisAngle(
         this.rotateAngle,
-        angleYCameraDirection + directionOffset
+        angleYCameraDirection + this.angleTuned + directionOffset
       );
       this.model.quaternion.rotateTowards(this.rotateQuarternion, 0.2);
 
