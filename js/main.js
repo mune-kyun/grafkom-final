@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import * as dat from "dat.gui";
 
 import bg2 from "../img/bg2.jpg";
@@ -7,6 +8,8 @@ import bg3 from "../img/bg3.jpg";
 import shion1 from "../img/shion1.png";
 import shion2 from "../img/shion2.jpg";
 import shion3 from "../img/shion3.png";
+
+const arissaURL = new URL("../assets/arissa.glb", import.meta.url);
 
 // canvas
 const renderer = new THREE.WebGLRenderer();
@@ -86,7 +89,7 @@ const gridHelper = new THREE.GridHelper(50);
 scene.add(gridHelper);
 
 // Plane
-const planeGeometry = new THREE.PlaneGeometry(30, 30);
+const planeGeometry = new THREE.PlaneGeometry(100, 30);
 const planeMaterial = new THREE.MeshStandardMaterial({
   color: 0xffffff,
   side: THREE.DoubleSide,
@@ -147,10 +150,38 @@ gui.addColor(options, "sphereColor").onChange(function (e) {
   sphere.material.color.set(e);
 });
 
+let mixer;
+
+// Arissa Model
+const assetLoader = new GLTFLoader();
+assetLoader.load(
+  arissaURL.href,
+  function (gltf) {
+    const model = gltf.scene;
+    model.position.set(-10, 2, 10);
+    scene.add(model);
+
+    mixer = new THREE.AnimationMixer(model);
+    const clips = gltf.animations;
+    const clip = THREE.AnimationClip.findByName(clips, "hiphop");
+    const action = mixer.clipAction(clip);
+    action.play();
+  },
+  undefined,
+  function (error) {
+    console.log(error);
+  }
+);
+
+// Clock
+const clock = new THREE.Clock();
+
 // Animate loop
 function animate(time) {
   cube.rotation.x = time / 1000;
   cube.rotation.y = time / 1000;
+
+  if (mixer) mixer.update(clock.getDelta());
 
   renderer.render(scene, camera);
 }
