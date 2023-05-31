@@ -8,6 +8,7 @@ import bg3 from "../img/bg3.jpg";
 import shion1 from "../img/shion1.png";
 import shion2 from "../img/shion2.jpg";
 import shion3 from "../img/shion3.png";
+import { CharacterControls } from "./characterControls";
 
 const arissaURL = new URL("../assets/arissa.glb", import.meta.url);
 
@@ -154,6 +155,7 @@ let mixer;
 
 // Arissa Model
 const assetLoader = new GLTFLoader();
+let characterControls;
 assetLoader.load(
   arissaURL.href,
   function (gltf) {
@@ -161,16 +163,43 @@ assetLoader.load(
     model.position.set(-10, 2, 10);
     scene.add(model);
 
+    // Animation
     mixer = new THREE.AnimationMixer(model);
     const clips = gltf.animations;
-    const clip = THREE.AnimationClip.findByName(clips, "hiphop");
-    const action = mixer.clipAction(clip);
-    action.play();
+    const clipsMap = new Map();
+    clips.forEach((a) => {
+      clipsMap.set(a.name, mixer.clipAction(a));
+    });
+
+    characterControls = new CharacterControls(
+      model,
+      mixer,
+      clipsMap,
+      camera,
+      "hiphop"
+    );
   },
   undefined,
   function (error) {
     console.log(error);
   }
+);
+
+// Control Keys
+const keysPressed = {};
+document.addEventListener(
+  "keydown",
+  (event) => {
+    keysPressed[event.key.toLowerCase()] = true;
+  },
+  false
+);
+document.addEventListener(
+  "keyup",
+  (event) => {
+    keysPressed[event.key.toLowerCase()] = false;
+  },
+  false
 );
 
 // Clock
@@ -181,7 +210,8 @@ function animate(time) {
   cube.rotation.x = time / 1000;
   cube.rotation.y = time / 1000;
 
-  if (mixer) mixer.update(clock.getDelta());
+  if (characterControls)
+    characterControls.update(clock.getDelta(), keysPressed);
 
   renderer.render(scene, camera);
 }
