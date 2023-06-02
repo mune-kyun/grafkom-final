@@ -9,6 +9,7 @@ import shion1 from "../img/shion1.png";
 import shion2 from "../img/shion2.jpg";
 import shion3 from "../img/shion3.png";
 import { CharacterControls } from "./characterControls";
+import { DegRadHelper } from "./utils";
 
 const arissaURL = new URL("../assets/arissa.glb", import.meta.url);
 
@@ -100,6 +101,12 @@ scene.add(plane);
 plane.rotation.x = -0.5 * Math.PI;
 plane.receiveShadow = true;
 
+// Ambient light
+const ambientLight = new THREE.AmbientLight(0x00ff00, 0.8);
+scene.add(ambientLight);
+const aLightGUI = new dat.GUI();
+aLightGUI.add(ambientLight, "intensity", 0, 2, 0.01);
+
 // Directional light
 const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
 scene.add(directionalLight);
@@ -115,6 +122,30 @@ const dLightShadowHelper = new THREE.CameraHelper(
 );
 scene.add(dLightShadowHelper);
 
+const dLightGUI = new dat.GUI();
+dLightGUI.add(directionalLight, "intensity", 0, 2, 0.01);
+dLightGUI.add(directionalLight.position, "x", -50, 50);
+dLightGUI.add(directionalLight.position, "z", -50, 50);
+dLightGUI.add(directionalLight.position, "y", 0, 50);
+
+// Spot light
+const spotLight = new THREE.SpotLight(0xff0000, 0.8);
+scene.add(spotLight);
+scene.add(spotLight.target);
+
+const spotLightHelper = new THREE.SpotLightHelper(spotLight);
+scene.add(spotLightHelper);
+
+const sLightGUI = new dat.GUI();
+sLightGUI.add(spotLight, "intensity", 0, 2, 0.01);
+sLightGUI.add(spotLight.position, "x", -50, 50);
+sLightGUI.add(spotLight.position, "z", -50, 50);
+sLightGUI.add(spotLight.position, "y", 0, 50);
+sLightGUI
+  .add(new DegRadHelper(spotLight, "angle"), "value", 0, 90)
+  .name("angle")
+  .onChange(() => spotLightHelper.update());
+
 // Sphere
 const sphereGeometry = new THREE.SphereGeometry(4, 50, 50);
 const sphereMaterial = new THREE.MeshStandardMaterial({
@@ -127,7 +158,7 @@ sphere.position.set(-10, 10, 0);
 sphere.castShadow = true;
 
 // Cube
-const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
+const cubeGeometry = new THREE.BoxGeometry(10, 10, 10);
 const cubeMultiMaterial = [
   new THREE.MeshBasicMaterial({ map: textureLoader.load(shion1) }),
   new THREE.MeshBasicMaterial({ map: textureLoader.load(shion1) }),
@@ -138,18 +169,9 @@ const cubeMultiMaterial = [
 ];
 const cube = new THREE.Mesh(cubeGeometry, cubeMultiMaterial);
 scene.add(cube);
-cube.position.y = 2;
+cube.position.y = 30;
 const cubeId = cube.id;
 let cubeState = 0;
-
-// GUI
-const gui = new dat.GUI();
-const options = {
-  sphereColor: "#ffea00",
-};
-gui.addColor(options, "sphereColor").onChange(function (e) {
-  sphere.material.color.set(e);
-});
 
 let mixer;
 

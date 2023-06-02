@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { W, A, S, D, DIRECTIONS } from "./utils";
 
 export class CharacterControls {
