@@ -9,6 +9,7 @@ export class CharacterControls {
 
   // state
   currentAction;
+  toggleRun = false;
 
   // temporary data
   walkDirection = new THREE.Vector3();
@@ -41,6 +42,10 @@ export class CharacterControls {
         value.play();
       }
     });
+  }
+
+  switchRunToggle() {
+    this.toggleRun = !this.toggleRun;
   }
 
   // calculate offset

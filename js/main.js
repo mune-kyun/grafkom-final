@@ -11,9 +11,11 @@ import shion3 from "../img/shion3.png";
 import { ArissaControls } from "./arissaControls";
 import { MariaControls } from "./mariaControls";
 import { DegRadHelper } from "./utils";
+import { KachujinControls } from "./kachujinControls";
 
 const arissaURL = new URL("../assets/arissa.glb", import.meta.url);
 const mariaURL = new URL("../assets/maria.glb", import.meta.url);
+const kachujinURL = new URL("../assets/kachujin.glb", import.meta.url);
 
 // canvas
 const renderer = new THREE.WebGLRenderer();
@@ -244,14 +246,52 @@ mariaAssetLoader.load(
   }
 );
 
+// Kachujin model
+let kachujinMixer;
+const kachujinAssetLoader = new GLTFLoader();
+let kachujinCharacterControls;
+kachujinAssetLoader.load(
+  kachujinURL.href,
+  function (gltf) {
+    const model = gltf.scene;
+    model.position.set(-30, 2, 10);
+    // model.scale.set(0.2, 0.2, 0.2);
+    scene.add(model);
+
+    // Animation
+    kachujinMixer = new THREE.AnimationMixer(model);
+    const clips = gltf.animations;
+    const clipsMap = new Map();
+    clips.forEach((a) => {
+      clipsMap.set(a.name, kachujinMixer.clipAction(a));
+    });
+
+    kachujinCharacterControls = new KachujinControls(
+      model,
+      kachujinMixer,
+      clipsMap,
+      camera,
+      "idle"
+    );
+  },
+  undefined,
+  function (error) {
+    console.log(error);
+  }
+);
+
 // Control Keys
 const keysPressed = {};
 document.addEventListener(
   "keydown",
   (event) => {
     const theKey = event.key.toLowerCase();
+    if (event.shiftKey && kachujinCharacterControls) {
+      kachujinCharacterControls.switchRunToggle();
+    }
     if (theKey == "1") modelState = "Arissa";
     else if (theKey == "2") modelState = "Maria";
+    else if (theKey == "3") modelState = "Kachujin";
     else keysPressed[event.key.toLowerCase()] = true;
   },
   false
@@ -259,7 +299,19 @@ document.addEventListener(
 document.addEventListener(
   "keyup",
   (event) => {
-    keysPressed[event.key.toLowerCase()] = false;
+    const theKey = event.key.toLowerCase();
+    if (modelState == "Kachujin") {
+      let timeout;
+      if (theKey == "i") timeout = 3000;
+      if (theKey == "j") timeout = 2400;
+      if (theKey == "k") timeout = 1000;
+      if (theKey == "l") timeout = 1000;
+      setTimeout(() => {
+        keysPressed[event.key.toLowerCase()] = false;
+      }, timeout);
+    } else {
+      keysPressed[event.key.toLowerCase()] = false;
+    }
   },
   false
 );
@@ -276,8 +328,20 @@ function animate(time) {
     characterControls.update(clock.getDelta(), keysPressed);
   if (modelState == "Maria" && mariaCharacterControls)
     mariaCharacterControls.update(clock.getDelta(), keysPressed);
+  if (modelState == "Kachujin" && kachujinCharacterControls)
+    kachujinCharacterControls.update(clock.getDelta(), keysPressed);
 
   renderer.render(scene, camera);
 }
 
 renderer.setAnimationLoop(animate);
+
+setTimeout(() => {
+  modelState = "Maria";
+  setTimeout(() => {
+    modelState = "Kachujin";
+    setTimeout(() => {
+      modelState = "Arissa";
+    }, 1000);
+  }, 1000);
+}, 1000);
