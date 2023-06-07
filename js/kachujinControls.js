@@ -2,10 +2,19 @@ import { CharacterControls } from "./characterControls";
 import { I, J, K, L, DIRECTIONS, ACTIONS } from "./utils";
 
 export class KachujinControls extends CharacterControls {
+  orbitControl;
   runVelocity = 15;
 
-  constructor(model, mixer, animationsMap, camera, currentAction) {
+  constructor(
+    model,
+    mixer,
+    animationsMap,
+    orbitControl,
+    camera,
+    currentAction
+  ) {
     super(model, mixer, animationsMap, camera, currentAction, 4);
+    this.orbitControl = orbitControl;
   }
 
   update(delta, keysPressed) {
@@ -71,6 +80,7 @@ export class KachujinControls extends CharacterControls {
       const moveZ = this.walkDirection.z * velocity * delta;
       this.model.position.x += moveX;
       this.model.position.z += moveZ;
+      this.updateCameraTarget(moveX, moveZ);
     } else if (this.currentAction == "flyingcombo") {
       // run/walk velocity
       const velocity = 1;
@@ -83,5 +93,17 @@ export class KachujinControls extends CharacterControls {
     }
 
     this.mixer.update(delta);
+  }
+
+  updateCameraTarget(moveX, moveZ) {
+    // move camera
+    this.camera.position.x += moveX;
+    this.camera.position.z += moveZ;
+
+    // update camera target
+    this.cameraTarget.x = this.model.position.x;
+    this.cameraTarget.y = this.model.position.y + 1;
+    this.cameraTarget.z = this.model.position.z;
+    this.orbitControl.target = this.cameraTarget;
   }
 }

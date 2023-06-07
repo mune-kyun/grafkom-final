@@ -270,6 +270,7 @@ kachujinAssetLoader.load(
       model,
       kachujinMixer,
       clipsMap,
+      orbit,
       camera,
       "idle"
     );
