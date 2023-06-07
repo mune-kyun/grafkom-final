@@ -4,8 +4,13 @@ export const W = "w";
 export const A = "a";
 export const S = "s";
 export const D = "d";
+export const I = "i";
+export const J = "j";
+export const K = "k";
+export const L = "l";
 export const SHIFT = "shift";
 export const DIRECTIONS = [W, A, S, D];
+export const ACTIONS = [I, J, K, L];
 
 export class DegRadHelper {
   constructor(obj, prop) {

@@ -21,12 +21,20 @@ export class CharacterControls {
   walkVelocity = 4;
   angleTuned = -135;
 
-  constructor(model, mixer, animationsMap, camera, currentAction) {
+  constructor(
+    model,
+    mixer,
+    animationsMap,
+    camera,
+    currentAction,
+    walkVelocity = 4
+  ) {
     this.model = model;
     this.mixer = mixer;
     this.animationsMap = animationsMap;
     this.camera = camera;
     this.currentAction = currentAction;
+    this.walkVelocity = walkVelocity;
 
     this.animationsMap.forEach((value, key) => {
       if (key == currentAction) {
@@ -35,6 +43,34 @@ export class CharacterControls {
     });
   }
 
+  // calculate offset
+  directionOffset(keysPressed) {
+    var directionOffset = 0; // w
+
+    if (keysPressed[W]) {
+      if (keysPressed[A]) {
+        directionOffset = Math.PI / 4; // w+a
+      } else if (keysPressed[D]) {
+        directionOffset = -Math.PI / 4; // w+d
+      }
+    } else if (keysPressed[S]) {
+      if (keysPressed[A]) {
+        directionOffset = Math.PI / 4 + Math.PI / 2; // s+a
+      } else if (keysPressed[D]) {
+        directionOffset = -Math.PI / 4 - Math.PI / 2; // s+d
+      } else {
+        directionOffset = Math.PI; // s
+      }
+    } else if (keysPressed[A]) {
+      directionOffset = Math.PI / 2; // a
+    } else if (keysPressed[D]) {
+      directionOffset = -Math.PI / 2; // d
+    }
+
+    return directionOffset;
+  }
+
+  // @Override this in subclass
   // like requestAnimationFrame
   update(delta, keysPressed) {
     // changing state
@@ -91,32 +127,5 @@ export class CharacterControls {
     }
 
     this.mixer.update(delta);
-  }
-
-  // calculate offset
-  directionOffset(keysPressed) {
-    var directionOffset = 0; // w
-
-    if (keysPressed[W]) {
-      if (keysPressed[A]) {
-        directionOffset = Math.PI / 4; // w+a
-      } else if (keysPressed[D]) {
-        directionOffset = -Math.PI / 4; // w+d
-      }
-    } else if (keysPressed[S]) {
-      if (keysPressed[A]) {
-        directionOffset = Math.PI / 4 + Math.PI / 2; // s+a
-      } else if (keysPressed[D]) {
-        directionOffset = -Math.PI / 4 - Math.PI / 2; // s+d
-      } else {
-        directionOffset = Math.PI; // s
-      }
-    } else if (keysPressed[A]) {
-      directionOffset = Math.PI / 2; // a
-    } else if (keysPressed[D]) {
-      directionOffset = -Math.PI / 2; // d
-    }
-
-    return directionOffset;
   }
 }

@@ -8,10 +8,12 @@ import bg3 from "../img/bg3.jpg";
 import shion1 from "../img/shion1.png";
 import shion2 from "../img/shion2.jpg";
 import shion3 from "../img/shion3.png";
-import { CharacterControls } from "./characterControls";
+import { ArissaControls } from "./arissaControls";
+import { MariaControls } from "./mariaControls";
 import { DegRadHelper } from "./utils";
 
 const arissaURL = new URL("../assets/arissa.glb", import.meta.url);
+const mariaURL = new URL("../assets/maria.glb", import.meta.url);
 
 // canvas
 const renderer = new THREE.WebGLRenderer();
@@ -173,9 +175,10 @@ cube.position.y = 30;
 const cubeId = cube.id;
 let cubeState = 0;
 
-let mixer;
+let modelState = "Arissa";
 
 // Arissa Model
+let mixer;
 const assetLoader = new GLTFLoader();
 let characterControls;
 assetLoader.load(
@@ -193,7 +196,7 @@ assetLoader.load(
       clipsMap.set(a.name, mixer.clipAction(a));
     });
 
-    characterControls = new CharacterControls(
+    characterControls = new ArissaControls(
       model,
       mixer,
       clipsMap,
@@ -207,12 +210,49 @@ assetLoader.load(
   }
 );
 
+// Maria model
+let mariaMixer;
+const mariaAssetLoader = new GLTFLoader();
+let mariaCharacterControls;
+mariaAssetLoader.load(
+  mariaURL.href,
+  function (gltf) {
+    const model = gltf.scene;
+    model.position.set(-20, 2, 10);
+    model.scale.set(0.2, 0.2, 0.2);
+    scene.add(model);
+
+    // Animation
+    mariaMixer = new THREE.AnimationMixer(model);
+    const clips = gltf.animations;
+    const clipsMap = new Map();
+    clips.forEach((a) => {
+      clipsMap.set(a.name, mariaMixer.clipAction(a));
+    });
+
+    mariaCharacterControls = new MariaControls(
+      model,
+      mariaMixer,
+      clipsMap,
+      camera,
+      "idle"
+    );
+  },
+  undefined,
+  function (error) {
+    console.log(error);
+  }
+);
+
 // Control Keys
 const keysPressed = {};
 document.addEventListener(
   "keydown",
   (event) => {
-    keysPressed[event.key.toLowerCase()] = true;
+    const theKey = event.key.toLowerCase();
+    if (theKey == "1") modelState = "Arissa";
+    else if (theKey == "2") modelState = "Maria";
+    else keysPressed[event.key.toLowerCase()] = true;
   },
   false
 );
@@ -232,8 +272,10 @@ function animate(time) {
   cube.rotation.x = time / 1000;
   cube.rotation.y = time / 1000;
 
-  if (characterControls)
+  if (modelState == "Arissa" && characterControls)
     characterControls.update(clock.getDelta(), keysPressed);
+  if (modelState == "Maria" && mariaCharacterControls)
+    mariaCharacterControls.update(clock.getDelta(), keysPressed);
 
   renderer.render(scene, camera);
 }
