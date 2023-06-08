@@ -50,6 +50,21 @@ const elseOptions = {
 };
 elseGUI.add(elseOptions, "wireframe").onChange(function (e) {
   sphere.material.wireframe = e;
+  model.traverse(function (node) {
+    if (node.isMesh) {
+      node.material.wireframe = e;
+    }
+  });
+  mariaModel.traverse(function (node) {
+    if (node.isMesh) {
+      node.material.wireframe = e;
+    }
+  });
+  kachujinModel.traverse(function (node) {
+    if (node.isMesh) {
+      node.material.wireframe = e;
+    }
+  });
 });
 
 // Background
@@ -187,6 +202,7 @@ const cubeMultiMaterial = [
 const cube = new THREE.Mesh(cubeGeometry, cubeMultiMaterial);
 scene.add(cube);
 cube.position.y = 30;
+cube.castShadow = true;
 const cubeId = cube.id;
 let cubeState = 0;
 
@@ -196,11 +212,12 @@ let modelState = "Arissa";
 let mixer;
 const assetLoader = new GLTFLoader();
 let characterControls;
+let model;
 assetLoader.load(
   arissaURL.href,
   function (gltf) {
-    const model = gltf.scene;
-    gltf.scene.traverse(function (node) {
+    model = gltf.scene;
+    model.traverse(function (node) {
       if (node.isMesh) {
         node.castShadow = true;
         // node.material.wireframe = true;
@@ -235,21 +252,22 @@ assetLoader.load(
 let mariaMixer;
 const mariaAssetLoader = new GLTFLoader();
 let mariaCharacterControls;
+let mariaModel;
 mariaAssetLoader.load(
   mariaURL.href,
   function (gltf) {
-    const model = gltf.scene;
-    gltf.scene.traverse(function (node) {
+    mariaModel = gltf.scene;
+    mariaModel.traverse(function (node) {
       if (node.isMesh) {
         node.castShadow = true;
       }
     });
-    model.position.set(-20, 2, 10);
-    model.scale.set(0.2, 0.2, 0.2);
-    scene.add(model);
+    mariaModel.position.set(-20, 2, 10);
+    mariaModel.scale.set(0.2, 0.2, 0.2);
+    scene.add(mariaModel);
 
     // Animation
-    mariaMixer = new THREE.AnimationMixer(model);
+    mariaMixer = new THREE.AnimationMixer(mariaModel);
     const clips = gltf.animations;
     const clipsMap = new Map();
     clips.forEach((a) => {
@@ -257,7 +275,7 @@ mariaAssetLoader.load(
     });
 
     mariaCharacterControls = new MariaControls(
-      model,
+      mariaModel,
       mariaMixer,
       clipsMap,
       camera,
@@ -274,20 +292,21 @@ mariaAssetLoader.load(
 let kachujinMixer;
 const kachujinAssetLoader = new GLTFLoader();
 let kachujinCharacterControls;
+let kachujinModel;
 kachujinAssetLoader.load(
   kachujinURL.href,
   function (gltf) {
-    const model = gltf.scene;
-    gltf.scene.traverse(function (node) {
+    kachujinModel = gltf.scene;
+    kachujinModel.traverse(function (node) {
       if (node.isMesh) {
         node.castShadow = true;
       }
     });
-    model.position.set(-30, 2, 10);
-    scene.add(model);
+    kachujinModel.position.set(-30, 2, 10);
+    scene.add(kachujinModel);
 
     // Animation
-    kachujinMixer = new THREE.AnimationMixer(model);
+    kachujinMixer = new THREE.AnimationMixer(kachujinModel);
     const clips = gltf.animations;
     const clipsMap = new Map();
     clips.forEach((a) => {
@@ -295,7 +314,7 @@ kachujinAssetLoader.load(
     });
 
     kachujinCharacterControls = new KachujinControls(
-      model,
+      kachujinModel,
       kachujinMixer,
       clipsMap,
       orbit,
