@@ -137,6 +137,19 @@ const aLightGUI = lightGUI.addFolder("ambient");
 aLightGUI.add(ambientLight, "intensity", 0, 2, 0.01);
 aLightGUI.open();
 
+// Point light
+const pointLight = new THREE.PointLight(0xcc8899, 1, 100);
+pointLight.position.set(50, 50, 50);
+pointLight.castShadow = true;
+scene.add(pointLight);
+
+const pLightGUI = lightGUI.addFolder("Point");
+pLightGUI.add(pointLight, "intensity", 0, 2, 0.01);
+pLightGUI.add(pointLight.position, "x", -200, 200);
+pLightGUI.add(pointLight.position, "z", -200, 200);
+pLightGUI.add(pointLight.position, "y", -200, 200);
+pLightGUI.open();
+
 // Directional light
 const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
 scene.add(directionalLight);
@@ -154,13 +167,14 @@ scene.add(dLightShadowHelper);
 
 const dLightGUI = lightGUI.addFolder("Directional");
 dLightGUI.add(directionalLight, "intensity", 0, 2, 0.01);
-dLightGUI.add(directionalLight.position, "x", -50, 50);
-dLightGUI.add(directionalLight.position, "z", -50, 50);
-dLightGUI.add(directionalLight.position, "y", 0, 50);
+dLightGUI.add(directionalLight.position, "x", -200, 200);
+dLightGUI.add(directionalLight.position, "z", -200, 200);
+dLightGUI.add(directionalLight.position, "y", -200, 200);
 dLightGUI.open();
 
 // Spot light
 const spotLight = new THREE.SpotLight(0xff0000, 0.8);
+spotLight.castShadow = true;
 scene.add(spotLight);
 scene.add(spotLight.target);
 
@@ -169,9 +183,9 @@ scene.add(spotLightHelper);
 
 const sLightGUI = lightGUI.addFolder("Spotlight");
 sLightGUI.add(spotLight, "intensity", 0, 2, 0.01);
-sLightGUI.add(spotLight.position, "x", -50, 50);
-sLightGUI.add(spotLight.position, "z", -50, 50);
-sLightGUI.add(spotLight.position, "y", 0, 50);
+sLightGUI.add(spotLight.position, "x", -200, 200);
+sLightGUI.add(spotLight.position, "z", -200, 200);
+sLightGUI.add(spotLight.position, "y", -200, 200);
 sLightGUI
   .add(new DegRadHelper(spotLight, "angle"), "value", 0, 90)
   .name("angle")
@@ -181,7 +195,7 @@ sLightGUI.open();
 // Sphere
 const sphereGeometry = new THREE.SphereGeometry(4, 50, 50);
 const sphereMaterial = new THREE.MeshStandardMaterial({
-  color: 0x0000ff,
+  color: 0xffff9f,
   wireframe: false,
 });
 const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
