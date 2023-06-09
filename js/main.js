@@ -50,6 +50,8 @@ const elseOptions = {
 };
 elseGUI.add(elseOptions, "wireframe").onChange(function (e) {
   sphere.material.wireframe = e;
+
+  // for models traverse for each node to change wireframe mode
   model.traverse(function (node) {
     if (node.isMesh) {
       node.material.wireframe = e;
@@ -231,6 +233,7 @@ assetLoader.load(
   arissaURL.href,
   function (gltf) {
     model = gltf.scene;
+    // important so the loaded glb cast shadow
     model.traverse(function (node) {
       if (node.isMesh) {
         node.castShadow = true;
@@ -348,9 +351,11 @@ document.addEventListener(
   "keydown",
   (event) => {
     const theKey = event.key.toLowerCase();
+    // switch kachujin run
     if (event.shiftKey && kachujinCharacterControls) {
       kachujinCharacterControls.switchRunToggle();
     }
+    // switch character
     if (theKey == "1") modelState = "Arissa";
     else if (theKey == "2") modelState = "Maria";
     else if (theKey == "3") modelState = "Kachujin";
@@ -362,6 +367,8 @@ document.addEventListener(
   "keyup",
   (event) => {
     const theKey = event.key.toLowerCase();
+
+    // this is to let us release the key while animation playing
     if (modelState == "Kachujin") {
       let timeout;
       if (theKey == "i") timeout = 3000;
@@ -386,6 +393,7 @@ function animate(time) {
   cube.rotation.x = time / 1000;
   cube.rotation.y = time / 1000;
 
+  // play model animation
   if (modelState == "Arissa" && characterControls)
     characterControls.update(clock.getDelta(), keysPressed);
   if (modelState == "Maria" && mariaCharacterControls)
@@ -398,6 +406,7 @@ function animate(time) {
 
 renderer.setAnimationLoop(animate);
 
+// dumb ways to avoid t-pose
 setTimeout(() => {
   modelState = "Maria";
   setTimeout(() => {
